@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { Bot, GrammyError, HttpError } from "grammy";
+import { Bot, GrammyError, HttpError, Keyboard } from "grammy";
 
 const BOT_KEY = process.env.BOT_API_KEY;
 const bot = new Bot(BOT_KEY);
@@ -9,76 +9,79 @@ const bot = new Bot(BOT_KEY);
 // Вторым асинхронную функцию с действием
 // Слушаем ввод
 
-const Person = {
-  dub: {
-    birthday: { 
-      date: "01.03.1994"
-    },
-    location: {
-      address: "Чистова 15.15 кв.62",
-    },
-  },
-};
 
-bot.api.setMyCommands([
-  {
-    command: "start",
-    description: "Запускает бота",
-  },
-  {
-    command: "help",
-    description: "Помогите",
-  },
-  {
-    command: "birthday",
-    description: "Узнать др",
-  },
-  {
-    command: "location",
-    description: "Узнать адрес",
-  },
-]);
+// ?Тут вставить данные 
 
-// command = ответ на команды [или массив команд] вида 'start' (или любое другое значение)
+// bot.api.setMyCommands([
+//   {
+//     command: "start",
+//     description: "Запуск бота",
+//   },
+//   {
+//     command: "info",
+//     description: "Что может бот",
+//   },
+// ]);
+
 bot.command("start", async (ctx) => {
-  await ctx.reply(`Привет ${ctx.from.first_name}`);
+  const firstKey = new Keyboard().text("Адрес").text("ДР").resized();
+
+  await ctx.reply(`Привет <b>${ctx.from.username}</b>. Что ты хочешь узнать?`, {
+    reply_markup: firstKey,
+    parse_mode: "HTML",
+  });
 });
 
-// bot.command("location", async (ctx) => {
-//   await ctx.reply(`Вот тебе адрес человека: ${Person.dub.location.address}`);
-// });
+bot.command("info", async (ctx) => {
+  const firstKey = new Keyboard().text("Адрес").text("ДР").resized();
 
+  await ctx.reply(
+    `Привет *${ctx.from.username}*
+Этот бот может не так много, лишь рассказать тебе о том где живут твои друзья, либо о том, когда у них др
 
-// //? кастомная фильтрация
-// bot.on('msg').filter((ctx) => {
-//   return ctx.from.id === 280181578;
-// }, async (ctx) => {
-//   await ctx.reply(`Привет: ${ctx.from.id}`)
-// })
+Спасибо тебе друг`,
+    {
+      reply_markup: firstKey,
+      parse_mode: "MarkdownV2",
+    }
+  );
+});
 
-// // фильтрация по доке
-// bot.on("message", async (ctx) => {
-//   await ctx.reply(`Сообщение: `);
-// });
+bot.hears("Адрес", async (ctx) => {
+  const addressKey = new Keyboard().resized().row();
 
+  Friends.forEach((friend) => {
+    addressKey.text(friend.family);
+  });
 
-// слушатель конкретных сообщений [или массива], может принимать первым аргументом expReg 
-bot.hears('жопа', async (ctx) => {
-  await ctx.reply(`Сам ты жопа`)
-})
+  await ctx.reply("Чей адрес тебя интересует?", {
+    reply_markup: addressKey,
+  });
+});
 
-// пример проверки слов через expReg
-bot.hears(/хуй/, async (ctx) => {
-  await ctx.reply(`ругаешься?`)
-})
+// Получения локации в зависимости от человека
+const getPersonLocation = (name) => {
+  const { address, floor, room, code, entry } = Friends.filter(
+    (item) => item.family === `${name}`
+  )[0].location;
+  return `*Адрес:* ${address}
+*этаж:* ${floor}
+*квартира:* ${room}
+*домофон:* ${code}`;
+};
 
+bot.hears(SecondName, async (ctx) => {
+  const personBtn = new Keyboard().text("Назад").text("Узнать Др").resized();
 
+  await ctx.reply(getPersonLocation(ctx.match), {
+    reply_markup: personBtn,
+    parse_mode: "MarkdownV2",
+  });
+});
 
-
-
-
-
-
+bot.on("message", async (ctx) => {
+  await ctx.reply("Я тебя не понимаю, пожалуйста выбери одну из команд");
+});
 
 
 
