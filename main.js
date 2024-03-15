@@ -9,8 +9,8 @@ const bot = new Bot(BOT_KEY);
 // Вторым асинхронную функцию с действием
 // Слушаем ввод
 
+// ?Тут вставить данные
 
-// ?Тут вставить данные 
 
 // bot.api.setMyCommands([
 //   {
@@ -24,16 +24,17 @@ const bot = new Bot(BOT_KEY);
 // ]);
 
 bot.command("start", async (ctx) => {
-  const firstKey = new Keyboard().text("Адрес").text("ДР").resized();
+  const firstKey = new Keyboard().text("Адрес📍").text("др🎂").resized();
 
-  await ctx.reply(`Привет <b>${ctx.from.username}</b>. Что ты хочешь узнать?`, {
+  await ctx.reply(`Привет <b>${ctx.from.username}</b>.
+Что ты хочешь узнать?`, {
     reply_markup: firstKey,
     parse_mode: "HTML",
   });
 });
 
 bot.command("info", async (ctx) => {
-  const firstKey = new Keyboard().text("Адрес").text("ДР").resized();
+  const firstKey = new Keyboard().text("Адрес📍").text("др🎂").resized();
 
   await ctx.reply(
     `Привет *${ctx.from.username}*
@@ -47,17 +48,35 @@ bot.command("info", async (ctx) => {
   );
 });
 
-bot.hears("Адрес", async (ctx) => {
+bot.hears("Адрес📍", async (ctx) => {
   const addressKey = new Keyboard().resized().row();
 
   Friends.forEach((friend) => {
     addressKey.text(friend.family);
   });
 
-  await ctx.reply("Чей адрес тебя интересует?", {
-    reply_markup: addressKey,
-  });
+  // const word = ctx.msg.text.replace(/[^а-яА-Яa-zA-Z]/g, '').toLowerCase();
+
+    await ctx.reply("Чей адрес тебя интересует?", {
+      reply_markup: addressKey,
+    });
+
 });
+
+bot.hears("др🎂", async (ctx) => {
+  const addressKey = new Keyboard().resized().row();
+
+  Friends.forEach((friend) => {
+    addressKey.text(friend.family);
+  });
+
+    await ctx.reply(`Чей др тебя интересует?`, {
+      reply_markup: addressKey,
+    });
+
+});
+
+
 
 // Получения локации в зависимости от человека
 const getPersonLocation = (name) => {
@@ -65,14 +84,16 @@ const getPersonLocation = (name) => {
     (item) => item.family === `${name}`
   )[0].location;
   return `*Адрес:* ${address}
+*подъезд*: ${entry}
 *этаж:* ${floor}
 *квартира:* ${room}
 *домофон:* ${code}`;
 };
 
-bot.hears(SecondName, async (ctx) => {
-  const personBtn = new Keyboard().text("Назад").text("Узнать Др").resized();
 
+
+bot.hears(SecondName, async (ctx) => {
+  const personBtn = new Keyboard().text("Назад").resized();
   await ctx.reply(getPersonLocation(ctx.match), {
     reply_markup: personBtn,
     parse_mode: "MarkdownV2",
@@ -82,6 +103,15 @@ bot.hears(SecondName, async (ctx) => {
 bot.on("message", async (ctx) => {
   await ctx.reply("Я тебя не понимаю, пожалуйста выбери одну из команд");
 });
+
+
+
+
+
+
+
+
+
 
 
 
