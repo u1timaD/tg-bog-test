@@ -82,7 +82,7 @@ bot.command("info", async (ctx) => {
     }
   );
 });
-
+ 
 bot.hears("Адрес📍", async (ctx) => {
   const addressKey = new Keyboard().resized().row();
   searchParam = "Адрес📍";
